@@ -1,4 +1,4 @@
-# LedgerWall — Lightweight Intrusion Detection & Prevention System (IDS/IPS)
+# Lightweight Intrusion Detection & Prevention System (IDS/IPS)
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Framework-Flask%20%7C%20Socket.IO-black.svg)](https://flask.palletsprojects.com/)
@@ -10,7 +10,6 @@
 > **BSc (Hons) Business Information Systems — Final Year Dissertation Project**  
 > **Cardiff Metropolitan University (UK) &bull; Cardiff School of Technology**  
 > *In collaboration with ICBT Campus, Sri Lanka*  
-> **Title:** *Developing and Evaluating a Lightweight Intrusion Detection System (IDS) for Securing Legacy Financial Audit Systems in SMEs*
 
 ---
 
@@ -19,8 +18,6 @@
 This software artifact was designed, developed, and empirically evaluated as the capstone research project for the degree of **Bachelor of Science (Honours) in Business Information Systems (BSc BIS)** at **Cardiff Metropolitan University (UK)** in partnership with **ICBT Campus (Sri Lanka)**.
 
 - **Author:** H.I. Gunathilake
-- **Student Registration:** st20343514 / KD-CBISM-16-21
-- **Supervisor:** Mr. Navin Thattil
 - **Academic Year / Submission:** March 2026
 - **Research Methodology:** Design Science Research (DSR)
 - **Case Study Organization:** LedgerWall Accounting & Finance (Gampaha, Sri Lanka)
