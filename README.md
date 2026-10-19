@@ -127,8 +127,6 @@ Detection Accuracy:
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/ledgerwall-ids.git
-cd ledgerwall-ids
 
 # Create virtual environment
 python -m venv venv
