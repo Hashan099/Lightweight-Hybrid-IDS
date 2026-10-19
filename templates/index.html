@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LedgerWall IDS — Security Dashboard</title>
+
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+      /* ===================================================================
+         Clean Enterprise Security Theme (High-Contrast Slate)
+         =================================================================== */
+      :root {
+        --bg-body: #0b0f19;
+        --bg-card: #111827;
+        --bg-card-hover: #162032;
+        --bg-subtle: #0f172a;
+        --border-color: #1f2937;
+        --border-color-focus: #374151;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --accent-blue: #3b82f6;
+        --accent-emerald: #10b981;
+        --accent-amber: #f59e0b;
+        --accent-red: #ef4444;
+        --accent-purple: #8b5cf6;
+        --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        margin: 0;
+        padding-bottom: 48px;
+        min-height: 100vh;
+      }
+
+      /* Navbar */
+      .navbar-ids {
+        background: #0f172a;
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.75rem 1.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .navbar-brand-ids {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .navbar-brand-ids .brand-pill {
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 4px;
+        letter-spacing: 0.5px;
+      }
+
+      .nav-pills-ids {
+        display: flex;
+        gap: 4px;
+      }
+
+      .nav-pills-ids .nav-link {
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.45rem 0.85rem;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+        text-decoration: none;
+      }
+
+      .nav-pills-ids .nav-link:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-pills-ids .nav-link.active {
+        color: #ffffff;
+        background: #1e293b;
+        border-color: #334155;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-family: var(--font-mono);
+      }
+
+      .status-pill.connected {
+        color: #34d399;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+      }
+
+      .status-pill.disconnected {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+      }
+
+      .status-pill.backend {
+        color: #c084fc;
+        background: rgba(168, 85, 247, 0.1);
+        border: 1px solid rgba(168, 85, 247, 0.25);
+      }
+
+      /* Cards */
+      .card-ids {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1.25rem;
+        height: 100%;
+        transition: border-color 0.15s ease;
+      }
+
+      .card-ids:hover {
+        border-color: var(--border-color-focus);
+      }
+
+      .card-ids .metric-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.35rem;
+      }
+
+      .card-ids .metric-value {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.1;
+      }
+
+      .card-ids .metric-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 0.35rem;
+      }
+
+      /* Threat Status Indicator Card */
+      .status-indicator-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 1rem 0;
+      }
+
+      .status-radar-ring {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 0.85rem;
+        transition: all 0.3s ease;
+      }
+
+      .status-radar-ring.secure {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        border: 2px solid rgba(16, 185, 129, 0.4);
+      }
+
+      .status-radar-ring.threat {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 2px solid #ef4444;
+        animation: pulseThreat 0.6s infinite alternate;
+      }
+
+      @keyframes pulseThreat {
+        from { transform: scale(0.98); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        to { transform: scale(1.05); box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+      }
+
+      .status-title-text {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: #10b981;
+      }
+
+      .status-title-text.threat-active {
+        color: #ef4444;
+      }
+
+      .threat-ticker {
+        margin-top: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        padding: 5px 12px;
+        border-radius: 6px;
+        max-width: 100%;
+        word-break: break-all;
+        display: none;
+      }
+
+      /* Live Feed */
+      .feed-container {
+        max-height: 320px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .feed-item {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+      }
+
+      .feed-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        gap: 6px;
+      }
+
+      .feed-time {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+
+      .feed-msg {
+        color: #f1f5f9;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        word-break: break-all;
+      }
+
+      /* Badges */
+      .badge-sev {
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+      }
+      .badge-sev.CRITICAL { background: #dc2626; color: #fff; }
+      .badge-sev.HIGH     { background: #ea580c; color: #fff; }
+      .badge-sev.MEDIUM   { background: #d97706; color: #fff; }
+      .badge-sev.LOW      { background: #2563eb; color: #fff; }
+
+      .badge-category {
+        background: #1e293b;
+        color: #93c5fd;
+        border: 1px solid #334155;
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+      }
+
+      .badge-action {
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      /* Tables */
+      .table-ids {
+        color: var(--text-primary);
+        font-size: 0.83rem;
+        margin-bottom: 0;
+      }
+
+      .table-ids thead th {
+        background: #1e293b;
+        color: var(--text-secondary);
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--border-color);
+        padding: 10px 14px;
+      }
+
+      .table-ids tbody tr {
+        border-bottom: 1px solid #1f2937;
+        transition: background 0.1s ease;
+      }
+
+      .table-ids tbody tr:hover {
+        background: #1e293b;
+      }
+
+      .table-ids td {
+        padding: 10px 14px;
+        vertical-align: middle;
+      }
+
+      .table-ids .mono-cell {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+      }
+
+      /* Rule Cards */
+      .rule-card-item {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+      }
+
+      .rule-pre {
+        background: #090d16;
+        border: 1px solid #1f2937;
+        color: #60a5fa;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin: 8px 0 0 0;
+        white-space: pre-wrap;
+      }
+
+      /* Form controls */
+      .form-control-ids {
+        background: #0f172a;
+        border: 1px solid var(--border-color);
+        color: #ffffff;
+        font-size: 0.83rem;
+        border-radius: 6px;
+        padding: 6px 12px;
+      }
+
+      .form-control-ids:focus {
+        background: #0f172a;
+        border-color: var(--accent-blue);
+        color: #ffffff;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+      }
+
+      /* Bottom System Bar */
+      .bottom-system-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #0f172a;
+        border-top: 1px solid var(--border-color);
+        padding: 6px 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 0.74rem;
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        z-index: 90;
+      }
+
+      .bottom-system-bar .val {
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      /* Buttons */
+      .btn-primary-ids {
+        background: #2563eb;
+        border: none;
+        color: #ffffff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 6px;
+      }
+      .btn-primary-ids:hover { background: #1d4ed8; color: #fff; }
+
+      .btn-secondary-ids {
+        background: #1e293b;
+        border: 1px solid var(--border-color);
+        color: #e2e8f0;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 6px 14px;
+        border-radius: 6px;
+      }
+      .btn-secondary-ids:hover { background: #334155; color: #fff; }
+
+      .btn-danger-ids {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #f87171;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 5px;
+      }
+      .btn-danger-ids:hover { background: #dc2626; color: #fff; }
+
+      /* Modals */
+      .modal-ids .modal-content {
+        background: #111827;
+        border: 1px solid #374151;
+        color: #f8fafc;
+        border-radius: 10px;
+      }
+      .modal-ids .modal-header {
+        border-bottom: 1px solid #1f2937;
+        padding: 14px 20px;
+      }
+      .modal-ids .modal-footer {
+        border-top: 1px solid #1f2937;
+        padding: 12px 20px;
+      }
+
+      .page-section { display: none; }
+      .page-section.active { display: block; }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar-ids">
+      <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
+        <a class="navbar-brand-ids" href="#" onclick="showSection('overview')">
+          <i class="bi bi-shield-check text-primary"></i>
+          <span>LEDGERWALL</span>
+          <span class="brand-pill">LIGHTWEIGHT IDS / IPS</span>
+        </a>
+
+        <div class="nav-pills-ids">
+          <a class="nav-link active" id="nav-overview" href="#" onclick="showSection('overview')">
+            <i class="bi bi-speedometer2 me-1"></i>Overview
+          </a>
+          <a class="nav-link" id="nav-logs" href="#" onclick="showSection('logs')">
+            <i class="bi bi-journal-text me-1"></i>Detection Log
+          </a>
+          <a class="nav-link" id="nav-rules" href="#" onclick="showSection('rules')">
+            <i class="bi bi-list-check me-1"></i>IDS Rules
+          </a>
+          <a class="nav-link" id="nav-blocklist" href="#" onclick="showSection('blocklist')">
+            <i class="bi bi-slash-circle me-1"></i>Blocklist
+          </a>
+          <a class="nav-link" id="nav-config" href="#" onclick="showSection('config')">
+            <i class="bi bi-sliders me-1"></i>Config
+          </a>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <span class="status-pill disconnected" id="conn-badge">
+            <i class="bi bi-circle-fill" style="font-size: 6px;"></i>
+            <span id="conn-text">DISCONNECTED</span>
+          </span>
+          <span class="status-pill backend" id="backend-badge" style="display:none;">
+            <i class="bi bi-database me-1"></i>
+            <span id="backend-text">JSON (LOCAL)</span>
+          </span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid px-4 py-3">
+
+      <!-- ============================================================
+           SECTION: OVERVIEW
+           ============================================================ -->
+      <div class="page-section active" id="section-overview">
+
+        <!-- Top Metric Cards -->
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-3">
+            <div class="card-ids">
+              <div class="metric-label">Total Blocked Attacks</div>
+              <div class="metric-value text-danger" id="stat-total">0</div>
+              <div class="metric-sub">Cumulative threats mitigated</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card-ids">
+              <div class="metric-label">Past 60 Minutes</div>
+              <div class="metric-value text-warning" id="stat-hour">0</div>
+              <div class="metric-sub" id="stat-rate">0.00 attacks / min</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card-ids">
+              <div class="metric-label">Past 24 Hours</div>
+              <div class="metric-value text-info" id="stat-day">0</div>
+              <div class="metric-sub">24h incident volume</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card-ids">
+              <div class="metric-label">Active Blocklisted IPs</div>
+              <div class="metric-value" id="stat-blocked">0</div>
+              <div class="metric-sub">Auto-blocked offenders</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Row: Status + Live Feed & Charts -->
+        <div class="row g-3">
+
+          <!-- Left Column: Status Widget & Live Alerts Feed -->
+          <div class="col-lg-4">
+            <div class="card-ids mb-3">
+              <div class="metric-label mb-2">Protection Engine Status</div>
+              <div class="status-indicator-box">
+                <div class="status-radar-ring secure" id="status-ring">
+                  <i class="bi bi-shield-check" id="status-icon"></i>
+                </div>
+                <div class="status-title-text" id="status-text">MONITORING ACTIVE</div>
+                <div class="text-secondary small mt-1">Uptime: <span id="uptime-display" class="font-monospace text-white">0:00:00</span></div>
+                <div class="threat-ticker" id="threat-ticker"></div>
+              </div>
+            </div>
+
+            <div class="card-ids">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="metric-label mb-0">Live Threat Stream</div>
+                <span class="badge bg-secondary text-white" style="font-size:0.65rem;">REAL-TIME</span>
+              </div>
+              <div class="feed-container" id="feed-container">
+                <div class="text-center text-muted py-4 small">
+                  <i class="bi bi-check2-circle fs-3 d-block mb-1 text-success"></i>
+                  No active security incidents detected.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Visual Analytics -->
+          <div class="col-lg-8">
+            <div class="row g-3">
+              <!-- Hourly Chart -->
+              <div class="col-12">
+                <div class="card-ids">
+                  <div class="metric-label mb-2">Attack Activity — Last 24 Hours</div>
+                  <div style="height: 190px;">
+                    <canvas id="chart-hourly"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Doughnut: Attack Vectors -->
+              <div class="col-md-5">
+                <div class="card-ids">
+                  <div class="metric-label mb-2">Threats by Classification</div>
+                  <div style="height: 190px;">
+                    <canvas id="chart-category"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bar: Top Offending IPs -->
+              <div class="col-md-7">
+                <div class="card-ids">
+                  <div class="metric-label mb-2">Top Malicious Source IPs</div>
+                  <div style="height: 190px;">
+                    <canvas id="chart-ips"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SECTION: DETECTION LOG
+           ============================================================ -->
+      <div class="page-section" id="section-logs">
+        <div class="card-ids">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <h5 class="fw-bold mb-1"><i class="bi bi-journal-text text-primary me-2"></i>Security Incident Log</h5>
+              <div class="text-secondary small">Comprehensive audit trail of all intercepted and inspected requests.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-secondary-ids" onclick="loadLogs()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+              <button class="btn btn-danger-ids" onclick="confirmResetLogs()">
+                <i class="bi bi-trash me-1"></i>Clear All Logs
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar -->
+          <div class="row g-2 mb-3 bg-dark p-2 rounded border border-secondary border-opacity-25">
+            <div class="col-md-3">
+              <input type="text" class="form-control form-control-ids w-100" id="filter-ip" placeholder="Search IP address..." oninput="debounceLoadLogs()" />
+            </div>
+            <div class="col-md-3">
+              <select class="form-select form-control-ids" id="filter-category" onchange="loadLogs()">
+                <option value="">All Threat Categories</option>
+                <option value="SQLi">SQL Injection (SQLi)</option>
+                <option value="XSS">Cross-Site Scripting (XSS)</option>
+                <option value="PathTraversal">Path Traversal</option>
+                <option value="CmdInjection">Command Injection</option>
+                <option value="DDoS">Application DDoS Flood</option>
+                <option value="NetworkDDoS">Network Packet Flood</option>
+                <option value="Scanner">Automated Scanner</option>
+                <option value="Custom">Custom User Rules</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select form-control-ids" id="filter-severity" onchange="loadLogs()">
+                <option value="">All Severities</option>
+                <option value="CRITICAL">CRITICAL</option>
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex justify-content-end align-items-center">
+              <span class="text-muted small" id="log-count-text">Loading records...</span>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="table-responsive">
+            <table class="table table-ids">
+              <thead>
+                <tr>
+                  <th>Timestamp (SLT)</th>
+                  <th>Client IP</th>
+                  <th>Method</th>
+                  <th>Requested URI</th>
+                  <th>Category</th>
+                  <th>Severity</th>
+                  <th>Action</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="log-tbody">
+                <tr><td colspan="8" class="text-center py-4 text-muted">Loading security logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary border-opacity-25 flex-wrap gap-2">
+            <div class="text-secondary small" id="log-page-info">Page 1</div>
+            <ul class="pagination pagination-sm mb-0" id="log-pagination"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SECTION: IDS RULES
+           ============================================================ -->
+      <div class="page-section" id="section-rules">
+        <div class="card-ids">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <h5 class="fw-bold mb-1"><i class="bi bi-list-check text-primary me-2"></i>Detection Rules Engine</h5>
+              <div class="text-secondary small">Stored custom inspection rules evaluated against incoming application traffic.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary-ids" onclick="showAddRuleModal()">
+                <i class="bi bi-plus-lg me-1"></i>Add Rule
+              </button>
+              <button class="btn btn-secondary-ids" onclick="loadRules()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+            </div>
+          </div>
+
+          <div id="rules-container">
+            <div class="text-center py-4 text-muted">Loading rules...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SECTION: BLOCKLIST
+           ============================================================ -->
+      <div class="page-section" id="section-blocklist">
+        <div class="row g-3">
+          <div class="col-md-5">
+            <div class="card-ids">
+              <h6 class="fw-bold mb-2">Manually Block Source IP</h6>
+              <p class="text-secondary small mb-3">Add an offending IP to immediately drop all future requests from that address.</p>
+              <div class="input-group">
+                <input type="text" class="form-control form-control-ids" id="block-ip-input" placeholder="e.g. 192.168.1.100" />
+                <button class="btn btn-danger-ids" onclick="addToBlocklist()">
+                  <i class="bi bi-slash-circle me-1"></i>Add Block
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <div class="card-ids">
+              <h6 class="fw-bold mb-2">Currently Blocklisted IPs (<span id="bl-count">0</span>)</h6>
+              <p class="text-secondary small mb-3">Click on any IP address badge below to unblock it.</p>
+              <div id="blocklist-container" class="d-flex flex-wrap gap-2">
+                <span class="text-muted small">No IPs are currently blocked.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SECTION: CONFIGURATION
+           ============================================================ -->
+      <div class="page-section" id="section-config">
+        <div class="card-ids">
+          <h5 class="fw-bold mb-1"><i class="bi bi-sliders text-primary me-2"></i>Threshold &amp; Monitoring Settings</h5>
+          <p class="text-secondary small mb-4">Adjust rate-limiting thresholds and security parameters live without restarting the service.</p>
+
+          <div class="row g-3" id="config-form">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex gap-2">
+            <button class="btn btn-primary-ids" onclick="saveConfig()">
+              <i class="bi bi-check2 me-1"></i>Save Configuration
+            </button>
+            <button class="btn btn-secondary-ids" onclick="loadConfig()">
+              <i class="bi bi-arrow-clockwise me-1"></i>Reset to Current
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom System Status Bar -->
+    <div class="bottom-system-bar">
+      <div><i class="bi bi-memory me-1 text-primary"></i>RAM: <span class="val" id="sys-ram">—</span> MB <span class="text-muted">(&lt;500 MB limit)</span></div>
+      <div><i class="bi bi-cpu me-1 text-primary"></i>CPU: <span class="val" id="sys-cpu">—</span>%</div>
+      <div><i class="bi bi-clock me-1 text-primary"></i>Uptime: <span class="val" id="sys-uptime">0:00:00</span></div>
+      <div><i class="bi bi-shield me-1 text-primary"></i>Rules: <span class="val" id="sys-rules">—</span></div>
+      <div><i class="bi bi-slash-circle me-1 text-danger"></i>Blocked IPs: <span class="val" id="sys-bl">0</span></div>
+    </div>
+
+    <!-- Modal: Add Rule -->
+    <div class="modal fade modal-ids" id="modal-add-rule" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title fw-bold">Create Custom IDS Detection Rule</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-bold">Rule Definition (JSON Format):</label>
+              <textarea class="form-control form-control-ids font-monospace" id="new-rule-text" rows="7"
+                placeholder='{
+  "category": "SQLi",
+  "severity": "HIGH",
+  "url": "union select",
+  "alert": "[SQLi] UNION SELECT attempt detected"
+}'></textarea>
+            </div>
+            <div class="text-muted small">
+              <strong>Supported Match Keys:</strong> <code>url</code>, <code>content</code> (POST body), <code>method</code>, <code>headers</code>.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary-ids" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary-ids" onclick="saveNewRule()">Save Rule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Incident Details -->
+    <div class="modal fade modal-ids" id="modal-alert-detail" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Security Incident Inspection</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="alert-detail-body">
+            <!-- Populated by JS -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger-ids" id="detail-block-btn">
+              <i class="bi bi-slash-circle me-1"></i>Block Source IP
+            </button>
+            <button type="button" class="btn btn-secondary-ids" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Logic Script -->
+    <script>
+      const state = {
+        currentSection: 'overview',
+        logsPage: 1,
+        logsTotalPages: 1,
+        systemUptime: 0,
+        charts: {},
+        debounceTimer: null,
+        threatTimer: null,
+      };
+
+      function showSection(name) {
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-pills-ids .nav-link').forEach(l => l.classList.remove('active'));
+
+        const sec = document.getElementById('section-' + name);
+        const link = document.getElementById('nav-' + name);
+        if (sec) sec.classList.add('active');
+        if (link) link.classList.add('active');
+
+        state.currentSection = name;
+        if (name === 'logs') loadLogs();
+        if (name === 'rules') loadRules();
+        if (name === 'blocklist') loadBlocklist();
+        if (name === 'config') loadConfig();
+      }
+
+      // SocketIO Setup
+      const socket = io('/web', { reconnectionDelay: 2000 });
+
+      socket.on('connect', () => {
+        const b = document.getElementById('conn-badge');
+        b.className = 'status-pill connected';
+        document.getElementById('conn-text').textContent = 'CONNECTED';
+      });
+
+      socket.on('disconnect', () => {
+        const b = document.getElementById('conn-badge');
+        b.className = 'status-pill disconnected';
+        document.getElementById('conn-text').textContent = 'DISCONNECTED';
+      });
+
+      socket.on('new_alert', (data) => {
+        handleIncomingThreat(data);
+      });
+
+      socket.on('stats_update', (stats) => {
+        updateStatsView(stats);
+      });
+
+      function handleIncomingThreat(data) {
+        // Visual indicator to RED
+        const ring = document.getElementById('status-ring');
+        const icon = document.getElementById('status-icon');
+        const text = document.getElementById('status-title-text') || document.getElementById('status-text');
+        const ticker = document.getElementById('threat-ticker');
+
+        ring.className = 'status-radar-ring threat';
+        icon.className = 'bi bi-shield-x text-danger';
+        text.textContent = 'ACTIVE THREAT BLOCKED';
+        text.className = 'status-title-text threat-active';
+
+        ticker.textContent = `[${data.severity || 'HIGH'}] ${data.alert}`;
+        ticker.style.display = 'block';
+
+        clearTimeout(state.threatTimer);
+        state.threatTimer = setTimeout(() => {
+          ring.className = 'status-radar-ring secure';
+          icon.className = 'bi bi-shield-check text-success';
+          text.textContent = 'MONITORING ACTIVE';
+          text.className = 'status-title-text';
+          ticker.style.display = 'none';
+        }, 8000);
+
+        // Add to Feed
+        addFeedItem(data);
+
+        // Reload log if active
+        if (state.currentSection === 'logs') loadLogs();
+      }
+
+      function addFeedItem(data) {
+        const feed = document.getElementById('feed-container');
+        if (feed.querySelector('.bi-check2-circle')) {
+          feed.innerHTML = '';
+        }
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+        const sev = data.severity || 'HIGH';
+        const cat = data.category || 'Threat';
+        const action = data.action || 'BLOCKED';
+
+        const item = document.createElement('div');
+        item.className = 'feed-item';
+        item.innerHTML = `
+          <div class="feed-header">
+            <div>
+              <span class="badge-action me-1">${esc(action)}</span>
+              <span class="badge-category me-1">${esc(cat)}</span>
+              <span class="badge-sev ${sev}">${sev}</span>
+            </div>
+            <div class="feed-time">${timeStr}</div>
+          </div>
+          <div class="feed-msg">${esc(data.alert)}</div>
+        `;
+
+        feed.insertBefore(item, feed.firstChild);
+        while (feed.children.length > 30) feed.removeChild(feed.lastChild);
+      }
+
+      function updateStatsView(stats) {
+        document.getElementById('stat-total').textContent = stats.total || 0;
+        document.getElementById('stat-hour').textContent = stats.last_hour || 0;
+        document.getElementById('stat-day').textContent = stats.last_day || 0;
+        document.getElementById('stat-blocked').textContent = (stats.blocked_ips || []).length;
+        document.getElementById('stat-rate').textContent = (stats.alerts_per_min || 0) + ' attacks / min';
+        document.getElementById('sys-bl').textContent = (stats.blocked_ips || []).length;
+        state.systemUptime = stats.uptime_seconds || state.systemUptime;
+
+        updateCharts(stats);
+      }
+
+      function initCharts() {
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.font.size = 11;
+        const gridColor = '#1f2937';
+
+        state.charts.hourly = new Chart(document.getElementById('chart-hourly'), {
+          type: 'line',
+          data: { labels: [], datasets: [{ label: 'Incidents', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.08)', fill: true, tension: 0.35, pointRadius: 3 }] },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: gridColor }, ticks: { maxTicksLimit: 12 } },
+              y: { grid: { color: gridColor }, beginAtZero: true, ticks: { precision: 0 } }
+            }
+          }
+        });
+
+        state.charts.category = new Chart(document.getElementById('chart-category'), {
+          type: 'doughnut',
+          data: { labels: [], datasets: [{ data: [], backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ec4899'], borderColor: '#111827', borderWidth: 2 }] },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 8, font: { size: 10 } } } }
+          }
+        });
+
+        state.charts.ips = new Chart(document.getElementById('chart-ips'), {
+          type: 'bar',
+          data: { labels: [], datasets: [{ label: 'Attacks', data: [], backgroundColor: 'rgba(239, 68, 68, 0.6)', borderColor: '#ef4444', borderWidth: 1 }] },
+          options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: gridColor }, beginAtZero: true, ticks: { precision: 0 } },
+              y: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      function updateCharts(stats) {
+        if (stats.hourly && state.charts.hourly) {
+          state.charts.hourly.data.labels = stats.hourly.map(h => h.label);
+          state.charts.hourly.data.datasets[0].data = stats.hourly.map(h => h.count);
+          state.charts.hourly.update('none');
+        }
+
+        if (stats.by_category && state.charts.category) {
+          const cats = Object.entries(stats.by_category);
+          state.charts.category.data.labels = cats.map(c => c[0]);
+          state.charts.category.data.datasets[0].data = cats.map(c => c[1]);
+          state.charts.category.update('none');
+        }
+
+        if (stats.top_ips && state.charts.ips) {
+          state.charts.ips.data.labels = stats.top_ips.map(i => i.ip);
+          state.charts.ips.data.datasets[0].data = stats.top_ips.map(i => i.count);
+          state.charts.ips.update('none');
+        }
+      }
+
+      // Detection Log Fetching
+      function loadLogs() {
+        const cat = document.getElementById('filter-category').value;
+        const sev = document.getElementById('filter-severity').value;
+        const ip = document.getElementById('filter-ip').value.trim();
+
+        let url = `/api/alerts?page=${state.logsPage}&limit=25`;
+        if (cat) url += `&category=${encodeURIComponent(cat)}`;
+        if (sev) url += `&severity=${encodeURIComponent(sev)}`;
+        if (ip) url += `&ip=${encodeURIComponent(ip)}`;
+
+        fetch(url)
+          .then(r => r.json())
+          .then(data => {
+            state.logsTotalPages = data.pages || 1;
+            renderLogRows(data.alerts || []);
+            document.getElementById('log-count-text').textContent = `Total: ${data.total} records`;
+            document.getElementById('log-page-info').textContent = `Showing page ${data.page} of ${data.pages || 1}`;
+            renderLogPagination();
+          })
+          .catch(() => {});
+      }
+
+      function renderLogRows(alerts) {
+        const tbody = document.getElementById('log-tbody');
+        if (!alerts.length) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted"><i class="bi bi-shield-check me-2 text-success"></i>No incidents match the selected filters.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = alerts.map(log => {
+          const dt = log.timestamp ? new Date(log.timestamp * 1000) : null;
+          const timeStr = dt ? dt.toLocaleString('en-US', { timeZone: 'Asia/Colombo', hour12: false }) : '—';
+          const sev = log.severity || 'HIGH';
+          const cat = log.category || 'Threat';
+          const action = log.action || 'BLOCKED';
+          const url = esc(log.url || '—');
+
+          return `
+            <tr>
+              <td class="mono-cell text-secondary" style="white-space:nowrap;">${timeStr}</td>
+              <td class="mono-cell fw-bold text-white">${esc(log.ip || '127.0.0.1')}</td>
+              <td><span class="badge bg-secondary font-monospace">${esc(log.method || 'GET')}</span></td>
+              <td class="mono-cell text-truncate" style="max-width:220px;" title="${url}">${url}</td>
+              <td><span class="badge-category">${esc(cat)}</span></td>
+              <td><span class="badge-sev ${sev}">${sev}</span></td>
+              <td><span class="badge-action">${esc(action)}</span></td>
+              <td>
+                <button class="btn btn-secondary-ids py-1 px-2" style="font-size:0.7rem;" onclick='openIncidentDetail(${JSON.stringify(JSON.stringify(log))})'>
+                  <i class="bi bi-eye"></i> View
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function renderLogPagination() {
+        const ul = document.getElementById('log-pagination');
+        if (state.logsTotalPages <= 1) { ul.innerHTML = ''; return; }
+
+        let html = '';
+        for (let p = 1; p <= state.logsTotalPages; p++) {
+          if (p === 1 || p === state.logsTotalPages || Math.abs(p - state.logsPage) <= 2) {
+            html += `<li class="page-item ${p === state.logsPage ? 'active' : ''}">
+              <a class="page-link bg-dark text-white border-secondary border-opacity-25" href="#" onclick="event.preventDefault();state.logsPage=${p};loadLogs();">${p}</a>
+            </li>`;
+          }
+        }
+        ul.innerHTML = html;
+      }
+
+      function openIncidentDetail(jsonStr) {
+        const log = JSON.parse(jsonStr);
+        const dt = log.timestamp ? new Date(log.timestamp * 1000).toLocaleString() : '—';
+
+        document.getElementById('alert-detail-body').innerHTML = `
+          <div class="row g-2 mb-3">
+            <div class="col-6"><span class="text-secondary small">Timestamp:</span> <div class="font-monospace text-white">${dt}</div></div>
+            <div class="col-6"><span class="text-secondary small">Severity:</span> <div><span class="badge-sev ${log.severity || 'HIGH'}">${log.severity || 'HIGH'}</span></div></div>
+            <div class="col-6"><span class="text-secondary small">Attacking IP:</span> <div class="font-monospace text-danger fw-bold">${esc(log.ip || '127.0.0.1')}</div></div>
+            <div class="col-6"><span class="text-secondary small">Action:</span> <div><span class="badge-action">${esc(log.action || 'BLOCKED')}</span></div></div>
+          </div>
+          <div class="mb-2"><span class="text-secondary small">Target URI:</span> <div class="font-monospace text-white bg-dark p-2 rounded small">${esc(log.url || '')}</div></div>
+          <div class="mb-2"><span class="text-secondary small">Alert Summary:</span> <div class="text-danger fw-semibold bg-dark p-2 rounded small">${esc(log.alert || '')}</div></div>
+          ${log.content ? `<div class="mb-2"><span class="text-secondary small">Decoded Request Body:</span> <pre class="font-monospace text-warning bg-dark p-2 rounded small">${esc(log.content)}</pre></div>` : ''}
+        `;
+
+        document.getElementById('detail-block-btn').onclick = () => {
+          if (log.ip) {
+            blockIp(log.ip);
+            bootstrap.Modal.getInstance(document.getElementById('modal-alert-detail')).hide();
+          }
+        };
+
+        new bootstrap.Modal(document.getElementById('modal-alert-detail')).show();
+      }
+
+      function debounceLoadLogs() {
+        clearTimeout(state.debounceTimer);
+        state.debounceTimer = setTimeout(loadLogs, 350);
+      }
+
+      function confirmResetLogs() {
+        if (!confirm('Clear all stored detection logs?')) return;
+        fetch('/api/reset-logs', { method: 'POST' })
+          .then(r => r.json())
+          .then(data => {
+            alert(data.message);
+            loadLogs();
+            loadStats();
+          });
+      }
+
+      // Rules Manager
+      function loadRules() {
+        fetch('/api/get-rules')
+          .then(r => r.json())
+          .then(rules => {
+            const container = document.getElementById('rules-container');
+            if (!rules.length) {
+              container.innerHTML = '<div class="text-center py-4 text-muted">No rules currently defined.</div>';
+              return;
+            }
+            container.innerHTML = rules.map(rule => {
+              const display = { ...rule };
+              delete display._id;
+              return `
+                <div class="rule-card-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="badge-category me-1">${esc(rule.category || 'Rule')}</span>
+                      <span class="badge-sev ${rule.severity || 'MEDIUM'} me-2">${rule.severity || 'MEDIUM'}</span>
+                      <span class="text-muted small font-monospace">ID: ${rule._id}</span>
+                    </div>
+                    <button class="btn btn-danger-ids" onclick="deleteRule('${rule._id}')">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                  <pre class="rule-pre">${esc(JSON.stringify(display, null, 2))}</pre>
+                </div>
+              `;
+            }).join('');
+          });
+      }
+
+      function showAddRuleModal() {
+        document.getElementById('new-rule-text').value = '';
+        new bootstrap.Modal(document.getElementById('modal-add-rule')).show();
+      }
+
+      function saveNewRule() {
+        try {
+          const rule = JSON.parse(document.getElementById('new-rule-text').value);
+          fetch('/api/add-rule', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(rule)
+          }).then(r => r.json()).then(data => {
+            if (data.status === 'success') {
+              bootstrap.Modal.getInstance(document.getElementById('modal-add-rule')).hide();
+              loadRules();
+            } else { alert(data.message); }
+          });
+        } catch (e) {
+          alert('Invalid JSON: ' + e.message);
+        }
+      }
+
+      function deleteRule(id) {
+        if (!confirm('Delete this rule?')) return;
+        fetch('/api/delete-rule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        }).then(() => loadRules());
+      }
+
+      // Blocklist
+      function loadBlocklist() {
+        fetch('/api/blocklist')
+          .then(r => r.json())
+          .then(data => {
+            const ips = data.blocked_ips || [];
+            document.getElementById('bl-count').textContent = ips.length;
+            const container = document.getElementById('blocklist-container');
+            if (!ips.length) {
+              container.innerHTML = '<span class="text-muted small">No IPs are currently blocked.</span>';
+              return;
+            }
+            container.innerHTML = ips.map(ip => `
+              <span class="badge bg-danger p-2 font-monospace" style="cursor:pointer;" onclick="unblockIp('${esc(ip)}')" title="Click to unblock">
+                ${esc(ip)} <i class="bi bi-x-circle ms-1"></i>
+              </span>
+            `).join('');
+          });
+      }
+
+      function addToBlocklist() {
+        const ip = document.getElementById('block-ip-input').value.trim();
+        if (!ip) return;
+        blockIp(ip);
+        document.getElementById('block-ip-input').value = '';
+      }
+
+      function blockIp(ip) {
+        fetch('/api/blocklist/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip })
+        }).then(() => loadBlocklist());
+      }
+
+      function unblockIp(ip) {
+        if (!confirm(`Unblock IP address ${ip}?`)) return;
+        fetch('/api/blocklist/remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip })
+        }).then(() => loadBlocklist());
+      }
+
+      // Config
+      let liveConfig = {};
+      function loadConfig() {
+        fetch('/api/config')
+          .then(r => r.json())
+          .then(cfg => {
+            liveConfig = cfg;
+            const labels = {
+              DDOS_TIME_WINDOW: 'L7 HTTP DDoS Time Window (Seconds)',
+              DDOS_THRESHOLD: 'L7 Max Requests Threshold per Window',
+              DDOS_ALERT_COOLDOWN: 'L7 Alert Notification Cooldown (Seconds)',
+              PACKET_TIME_WINDOW: 'L3/L4 Network Packet Sniffing Window (Seconds)',
+              PACKET_THRESHOLD: 'L3/L4 Max Packet Threshold per Window',
+              PACKET_ALERT_COOLDOWN: 'L3/L4 Alert Cooldown (Seconds)',
+              BLOCKLIST_THRESHOLD: 'Auto-Block IP After N Incidents',
+              BLOCKLIST_ENABLED: 'Enable Automatic IP Blocklist',
+            };
+            document.getElementById('config-form').innerHTML = Object.entries(cfg).map(([k, v]) => `
+              <div class="col-md-6">
+                <label class="form-label text-secondary small fw-semibold">${labels[k] || k}</label>
+                ${typeof v === 'boolean'
+                  ? `<select class="form-select form-control-ids" id="cfg-${k}">
+                       <option value="true" ${v ? 'selected' : ''}>Enabled</option>
+                       <option value="false" ${!v ? 'selected' : ''}>Disabled</option>
+                     </select>`
+                  : `<input type="number" class="form-control form-control-ids" id="cfg-${k}" value="${v}">`
+                }
+              </div>
+            `).join('');
+          });
+      }
+
+      function saveConfig() {
+        const updated = {};
+        for (const k of Object.keys(liveConfig)) {
+          const el = document.getElementById('cfg-' + k);
+          if (el) {
+            updated[k] = typeof liveConfig[k] === 'boolean' ? el.value === 'true' : Number(el.value);
+          }
+        }
+        fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated)
+        }).then(r => r.json()).then(data => {
+          if (data.status === 'success') {
+            alert('Configuration saved successfully!');
+            loadConfig();
+          }
+        });
+      }
+
+      // System Telemetry
+      function loadSystemMetrics() {
+        fetch('/api/system')
+          .then(r => r.json())
+          .then(d => {
+            document.getElementById('sys-ram').textContent = d.memory_mb >= 0 ? d.memory_mb : '—';
+            document.getElementById('sys-cpu').textContent = d.cpu_percent >= 0 ? d.cpu_percent : '—';
+            document.getElementById('sys-rules').textContent = d.rules_count || 0;
+            state.systemUptime = d.uptime_seconds || state.systemUptime;
+
+            const badge = document.getElementById('backend-badge');
+            const text = document.getElementById('backend-text');
+            if (badge && text && d.backend) {
+              badge.style.display = 'inline-flex';
+              text.textContent = d.backend === 'mongodb' ? 'MONGODB' : 'JSON (LOCAL)';
+            }
+          });
+      }
+
+      function formatUptime(s) {
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+      }
+
+      setInterval(() => {
+        state.systemUptime++;
+        const str = formatUptime(state.systemUptime);
+        document.getElementById('uptime-display').textContent = str;
+        document.getElementById('sys-uptime').textContent = str;
+      }, 1000);
+
+      function loadStats() {
+        fetch('/api/stats').then(r => r.json()).then(updateStatsView);
+      }
+
+      function esc(str) {
+        if (str == null) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initCharts();
+        loadStats();
+        loadSystemMetrics();
+        setInterval(loadStats, 20000);
+        setInterval(loadSystemMetrics, 10000);
+      });
+    </script>
+  </body>
+</html>

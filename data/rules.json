@@ -1,0 +1,280 @@
+[
+  {
+    "category": "SQLi",
+    "severity": "HIGH",
+    "url": "union select",
+    "alert": "[SQLi] UNION SELECT injection attempt detected",
+    "created_at": "2026-10-19T12:16:19.344614",
+    "_id": "4c58594f4e6744d9942b068e"
+  },
+  {
+    "category": "SQLi",
+    "severity": "HIGH",
+    "url": "' or '1'='1",
+    "alert": "[SQLi] Classic OR-based SQL injection detected",
+    "created_at": "2026-10-19T12:16:19.345826",
+    "_id": "2817f9bc1dea44369182aa9b"
+  },
+  {
+    "category": "SQLi",
+    "severity": "HIGH",
+    "url": "drop table",
+    "alert": "[SQLi] DROP TABLE command in URL — possible destructive SQLi",
+    "created_at": "2026-10-19T12:16:19.353461",
+    "_id": "93d797334e7e47d58fdbac31"
+  },
+  {
+    "category": "SQLi",
+    "severity": "HIGH",
+    "content": "union select",
+    "alert": "[SQLi] UNION SELECT in POST body — SQL injection attempt",
+    "created_at": "2026-10-19T12:16:19.359864",
+    "_id": "477a10340399485898f27296"
+  },
+  {
+    "category": "SQLi",
+    "severity": "HIGH",
+    "content": "'; drop table",
+    "alert": "[SQLi] DROP TABLE in POST body — destructive SQL injection",
+    "created_at": "2026-10-19T12:16:19.366627",
+    "_id": "4687d81936194660a0faa87e"
+  },
+  {
+    "category": "SQLi",
+    "severity": "MEDIUM",
+    "url": "sleep(",
+    "alert": "[SQLi] Time-based blind SQLi — SLEEP() detected in URL",
+    "created_at": "2026-10-19T12:16:19.372495",
+    "_id": "d0e8e189d2f742e9a28320b1"
+  },
+  {
+    "category": "SQLi",
+    "severity": "MEDIUM",
+    "url": "benchmark(",
+    "alert": "[SQLi] Time-based blind SQLi — BENCHMARK() detected",
+    "created_at": "2026-10-19T12:16:19.379718",
+    "_id": "efb72623e51240b39843d3f3"
+  },
+  {
+    "category": "SQLi",
+    "severity": "HIGH",
+    "url": "information_schema",
+    "alert": "[SQLi] INFORMATION_SCHEMA enumeration attempt",
+    "created_at": "2026-10-19T12:16:19.385637",
+    "_id": "2751f9d022384054b0a4724f"
+  },
+  {
+    "category": "SQLi",
+    "severity": "CRITICAL",
+    "url": "into outfile",
+    "alert": "[SQLi] INTO OUTFILE detected — possible file write via SQLi",
+    "created_at": "2026-10-19T12:16:19.392522",
+    "_id": "6c61240e271a46f7a8c4108e"
+  },
+  {
+    "category": "XSS",
+    "severity": "MEDIUM",
+    "url": "<script>",
+    "alert": "[XSS] Script tag detected in URL",
+    "created_at": "2026-10-19T12:16:19.398745",
+    "_id": "604cb15b6a524e90aa90dc0b"
+  },
+  {
+    "category": "XSS",
+    "severity": "MEDIUM",
+    "content": "<script>",
+    "alert": "[XSS] Script tag detected in POST body",
+    "created_at": "2026-10-19T12:16:19.405550",
+    "_id": "c03aa870700d45bebc023743"
+  },
+  {
+    "category": "XSS",
+    "severity": "MEDIUM",
+    "url": "javascript:",
+    "alert": "[XSS] javascript: URI detected",
+    "created_at": "2026-10-19T12:16:19.416688",
+    "_id": "ace2773f154f4b608e54d896"
+  },
+  {
+    "category": "XSS",
+    "severity": "MEDIUM",
+    "url": "onerror=",
+    "alert": "[XSS] onerror= event handler in URL — XSS attempt",
+    "created_at": "2026-10-19T12:16:19.427004",
+    "_id": "3f32b15476424129aba4448f"
+  },
+  {
+    "category": "XSS",
+    "severity": "MEDIUM",
+    "url": "onload=",
+    "alert": "[XSS] onload= event handler in URL — XSS attempt",
+    "created_at": "2026-10-19T12:16:19.438372",
+    "_id": "56eccccb738e4ecb9e55cad8"
+  },
+  {
+    "category": "XSS",
+    "severity": "LOW",
+    "url": "alert(",
+    "alert": "[XSS] alert() function detected in URL — potential XSS probe",
+    "created_at": "2026-10-19T12:16:19.448905",
+    "_id": "6574bb3a3ff14f23a8aa2493"
+  },
+  {
+    "category": "PathTraversal",
+    "severity": "HIGH",
+    "url": "../",
+    "alert": "[PATH TRAVERSAL] Directory traversal attempt in URL",
+    "created_at": "2026-10-19T12:16:19.460510",
+    "_id": "cdc7d161029c41658b5f2e99"
+  },
+  {
+    "category": "PathTraversal",
+    "severity": "HIGH",
+    "url": "/etc/passwd",
+    "alert": "[PATH TRAVERSAL] Attempt to read /etc/passwd",
+    "created_at": "2026-10-19T12:16:19.467347",
+    "_id": "1f237517c42a455487a2ba98"
+  },
+  {
+    "category": "PathTraversal",
+    "severity": "HIGH",
+    "url": "/etc/shadow",
+    "alert": "[PATH TRAVERSAL] Attempt to read /etc/shadow",
+    "created_at": "2026-10-19T12:16:19.475009",
+    "_id": "f9cdf1f1f6e244489c9573d0"
+  },
+  {
+    "category": "PathTraversal",
+    "severity": "MEDIUM",
+    "url": "%2e%2e%2f",
+    "alert": "[PATH TRAVERSAL] URL-encoded traversal sequence detected",
+    "created_at": "2026-10-19T12:16:19.482660",
+    "_id": "cba8ce9dfbed4d09a19c2830"
+  },
+  {
+    "category": "Scanner",
+    "severity": "LOW",
+    "headers": {
+      "User-Agent": "sqlmap"
+    },
+    "alert": "[SCANNER] SQLMap automated scanner detected",
+    "created_at": "2026-10-19T12:16:19.489621",
+    "_id": "eff3c77a105740558691310f"
+  },
+  {
+    "category": "Scanner",
+    "severity": "LOW",
+    "headers": {
+      "User-Agent": "nikto"
+    },
+    "alert": "[SCANNER] Nikto web scanner detected",
+    "created_at": "2026-10-19T12:16:19.497851",
+    "_id": "4d648981249c4c7e81e163ce"
+  },
+  {
+    "category": "Scanner",
+    "severity": "LOW",
+    "headers": {
+      "User-Agent": "nmap"
+    },
+    "alert": "[SCANNER] Nmap port scanner detected",
+    "created_at": "2026-10-19T12:16:19.505028",
+    "_id": "50a1a2c324ab4ae2ba286f1f"
+  },
+  {
+    "category": "Scanner",
+    "severity": "LOW",
+    "headers": {
+      "User-Agent": "masscan"
+    },
+    "alert": "[SCANNER] Masscan port scanner detected",
+    "created_at": "2026-10-19T12:16:19.512894",
+    "_id": "303bccb5ac8e474bacf4c414"
+  },
+  {
+    "category": "Scanner",
+    "severity": "LOW",
+    "headers": {
+      "User-Agent": "dirbuster"
+    },
+    "alert": "[SCANNER] DirBuster directory brute-force detected",
+    "created_at": "2026-10-19T12:16:19.520511",
+    "_id": "32a0431c6d14471cac2e3194"
+  },
+  {
+    "category": "Scanner",
+    "severity": "LOW",
+    "headers": {
+      "User-Agent": "gobuster"
+    },
+    "alert": "[SCANNER] GoBuster directory brute-force detected",
+    "created_at": "2026-10-19T12:16:19.527924",
+    "_id": "37fdfdc7a398444db6cac2a1"
+  },
+  {
+    "category": "Scanner",
+    "severity": "LOW",
+    "headers": {
+      "User-Agent": "python-requests"
+    },
+    "alert": "[SCANNER] Automated Python requests client detected",
+    "created_at": "2026-10-19T12:16:19.536050",
+    "_id": "d7c8f72fcb3343b081a80ec9"
+  },
+  {
+    "category": "Probing",
+    "severity": "MEDIUM",
+    "url": "/wp-admin",
+    "alert": "[PROBE] WordPress admin panel probe detected",
+    "created_at": "2026-10-19T12:16:19.543214",
+    "_id": "bd556d89374047bf89310413"
+  },
+  {
+    "category": "Probing",
+    "severity": "MEDIUM",
+    "url": "/.env",
+    "alert": "[PROBE] .env file access attempt — credential harvesting risk",
+    "created_at": "2026-10-19T12:16:19.551434",
+    "_id": "d7463cee9abe4e6ba79660a4"
+  },
+  {
+    "category": "Probing",
+    "severity": "MEDIUM",
+    "url": "/phpMyAdmin",
+    "alert": "[PROBE] phpMyAdmin access attempt detected",
+    "created_at": "2026-10-19T12:16:19.558591",
+    "_id": "8a6d2cb846844be8a5078ddc"
+  },
+  {
+    "category": "Probing",
+    "severity": "MEDIUM",
+    "url": "/admin/config",
+    "alert": "[PROBE] Admin config endpoint probed",
+    "created_at": "2026-10-19T12:16:19.566849",
+    "_id": "b68a62fe048c4d68bcefd247"
+  },
+  {
+    "category": "Probing",
+    "severity": "LOW",
+    "url": "/.git",
+    "alert": "[PROBE] Git repository directory access attempt",
+    "created_at": "2026-10-19T12:16:19.574843",
+    "_id": "d7f3384f9c85486cae9c54c4"
+  },
+  {
+    "category": "Probing",
+    "severity": "HIGH",
+    "url": "/shell",
+    "alert": "[PROBE] Web shell access attempt detected",
+    "created_at": "2026-10-19T12:16:19.583169",
+    "_id": "0ac75c283d014c5b871c8863"
+  },
+  {
+    "category": "Probing",
+    "severity": "HIGH",
+    "url": "/cmd",
+    "alert": "[PROBE] Command execution endpoint probe detected",
+    "created_at": "2026-10-19T12:16:19.590256",
+    "_id": "38b2682cf65e4e3e8f502d4c"
+  }
+]
