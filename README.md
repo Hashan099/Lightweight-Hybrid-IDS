@@ -13,6 +13,11 @@
 
 ---
 
+<img width="2538" height="1300" alt="Screenshot 2026-10-19 182320" src="https://github.com/user-attachments/assets/079e7db7-ccb4-4287-adf1-455339cdc5f2" />
+<img width="665" height="595" alt="Screenshot 2026-10-19 182357" src="https://github.com/user-attachments/assets/b8395932-b047-4967-a9dd-1911e28c2c3e" />
+
+
+
 ## 🎓 Academic Dissertation Context
 
 This software artifact was designed, developed, and empirically evaluated as the capstone research project for the degree of **Bachelor of Science (Honours) in Business Information Systems (BSc BIS)** at **Cardiff Metropolitan University (UK)** in partnership with **ICBT Campus (Sri Lanka)**.
