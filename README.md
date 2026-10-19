@@ -59,34 +59,6 @@ Standard enterprise security tools crash this server by inducing Out-Of-Memory (
 
 The solution operates as a **hybrid, dual-tier intrusion detection and prevention wrapper**:
 
-```mermaid
-flowchart TD
-    Client["👤 Client / Field Auditor / Malicious Actor"]
-    
-    subgraph Layer7Proxy [In-Line Layer 7 Reverse Proxy & WAF - Port 8080]
-        Proxy["🛡️ proxy_interceptor.py (mitmproxy)\n- URL Unquoting & Normalization\n- Evasion-Resistant Regex Engine\n- In-Line Request Terminator (HTTP 403)"]
-    end
-    
-    subgraph ProtectedBackend [Protected Legacy VPS Environment]
-        LegacyApp["🏛️ Legacy Financial Portal (Port 81)\n(PHP 5.6 / LAMP Audit Ledger)"]
-    end
-    
-    subgraph CoreIDSEngine [Lightweight IDS Core & Telemetry - Port 5000]
-        IDSEngine["🧠 ids_engine.py (Flask + Socket.IO)\n- L7 Sliding Window DDoS Tracker\n- Multi-Tier Severity Classifier\n- Real-Time WebSocket Dispatcher\n- REST API & Auto-Blocklist Manager"]
-        NetMon["📡 network_monitor.py (Scapy Monitor)\n- Raw Packet Sniffing\n- Volumetric SYN/UDP/ICMP Flood Detection"]
-        DB["🗄️ database.py (Storage Abstraction)\n- Production: MongoDB :27017\n- Dev/Standalone: Local Thread-Safe JSON\n- Automatic Baseline Signature Seeder"]
-        Dashboard["🖥️ Security Dashboard (Web UI :5000)\n- High-Contrast Modern Slate Theme\n- Real-Time Threat Radar Widget\n- Live Charts & Filterable Log Table"]
-    end
-
-    Client -->|HTTP Request| Proxy
-    Proxy -->|Clean Request (ALLOWED)| LegacyApp
-    Proxy -.->|Threat Detected (BLOCKED HTTP 403)| Client
-    Proxy -->|Emit Security Event| IDSEngine
-    NetMon -->|Emit Packet Flood Alert| IDSEngine
-    IDSEngine <--> DB
-    IDSEngine -->|Real-Time WebSocket Stream| Dashboard
-```
-
 ### Component Breakdown
 
 | Module | Component | Technical Role |
@@ -121,17 +93,6 @@ Detection Accuracy:
   Application Layer (FR-01)    :  95.00% (19 of 20 deterministic attack vectors blocked)
   Network DDoS Flood (FR-02)   : 100.00% (Tripped precisely at configured packet threshold)
 ```
-
-### 2. Stakeholder Traceability Matrix (DSR Methodology)
-
-| Stakeholder Input | Identified Constraint | Requirement ID | Engineering Solution |
-|---|---|---|---|
-| IT Administrator | *"VPS has 2GB RAM. Existing DB uses 1.2GB. Any heavy tool crashes the server."* | **NFR-01 (Efficiency)** | Native Python lightweight scripts; resident memory strictly capped under 150 MB. |
-| IT Administrator | *"SQL Injection is our biggest fear for unpatched PHP code."* | **FR-01 (Application Security)** | In-line reverse proxy WAF evaluating 19 compiled SQLi regex patterns with payload unquoting. |
-| Operations Manager | *"Traffic floods take the portal offline. We have zero budget for software licenses."* | **FR-02 (Availability) & NFR-03 (Cost)** | Hybrid threshold-based DDoS counting; 100% open-source zero-licensing architecture. |
-| Operations Manager | *"Security cannot make remote audit queries lag during filing deadlines."* | **NFR-02 (Usability)** | In-memory regex compilation and non-blocking WebSockets; negligible **4.419 ms** latency. |
-
----
 
 ## 🛡️ Comprehensive Detection Vector Matrix
 
@@ -264,24 +225,6 @@ The IDS Engine exposes a full programmatic REST API on port `5000`:
 | `/api/blocklist/add` | `POST` | Manually adds an IP address to the blocklist. |
 | `/api/blocklist/remove`| `POST` | Removes an IP from the blocklist. |
 | `/api/config` | `GET / POST`| Reads or updates real-time rate-limiting thresholds and cooldown windows. |
-
----
-
-## 📄 Academic Citation & Project Details
-
-If you utilize this project, architectural framework, or evaluation methodology for academic research or reference, please cite:
-
-```bibtex
-@thesis{gunathilake2026lightweightids,
-  author       = {Gunathilake, H. I.},
-  title        = {Developing and Evaluating a Lightweight Intrusion Detection System (IDS) for Securing Legacy Financial Audit Systems in SMEs},
-  school       = {Cardiff School of Technology, Cardiff Metropolitan University},
-  year         = {2026},
-  month        = {March},
-  type         = {BSc (Hons) Business Information Systems Dissertation},
-  note         = {Supervised by Navin Thattil. In collaboration with ICBT Campus, Sri Lanka}
-}
-```
 
 ---
 
